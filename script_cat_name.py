@@ -27,6 +27,7 @@ def main():
 	files=glob.glob(dirname+'*.txt')
 	for file in files : 
 		with open(file, 'r') as f_in : 
+
 			for n, line in enumerate(f_in) :
 				list_taggs= []
 				list_taggs2 = []
@@ -42,9 +43,13 @@ def main():
 							name+=tag[0]+' '
 					if name!='' :
 				 		break
-
-				nom=re.sub(r'(.+)([A-Z][a-z]+um) (.+)', r'\2', line)
-				print nom
+				print "--- Mon fichier est "+file+" ---"
+				if re.match(r'(.+)?([A-Z][a-z]+(um|us|i|ii|a|as) ([a-z]+)?) (.+)', line) :
+					nom=re.sub(r'(.+)?([A-Z][a-z]+(um|us|i|ii|a|as) ([a-z]+)?) (.+)', r'\2', line)
+					print "nom "+nom
+				if re.match(r'(.+)([A-Z]\. [a-z]+)(.+)', line) :
+					abb=re.sub(r'(.+)([A-Z]\. [a-z]+)(.+)', r'\2', line )
+					print "abb "+abb
 				#for tagg2 in taggs :
 				#	list_taggs2.append(tagg2[1])
 				#for x in list_tag2 : 
