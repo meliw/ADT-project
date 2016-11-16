@@ -22,6 +22,7 @@ list_tag2 = [['NNP', 'NN'],['NNP', 'NNP'], ['NNP', 'NNS'], ['NNS', 'NNS'], ['NN'
 list_tag1 = [['NNP'], ['NNS'], ['NN']]
 
 list_tagg_v2 = ['NNP', 'NNS', 'NN']
+list_name=[]
 
 def main():
 	files=glob.glob(dirname+'*.txt')
@@ -41,15 +42,22 @@ def main():
 					if check_tagg(list_taggs) : 
 						for tag in taggs :
 							name+=tag[0]+' '
+					if name not in list_name:
+						list_name.append(name)
 					if name!='' :
+						#print "name "+name
 				 		break
-				print "--- Mon fichier est "+file+" ---"
 				if re.match(r'(.+)?([A-Z][a-z]+(um|us|i|ii|a|as) ([a-z]+)?) (.+)', line) :
-					nom=re.sub(r'(.+)?([A-Z][a-z]+(um|us|i|ii|a|as) ([a-z]+)?) (.+)', r'\2', line)
-					print "nom "+nom
+					nom=re.findall(r'([A-Z][a-z]+(um|us|i|ii|a|as) ([a-z]+)?)', line)
+					for j in range(len(nom)) :
+						if nom[j][0] not in list_name :
+							list_name.append(nom[j][0])
 				if re.match(r'(.+)([A-Z]\. [a-z]+)(.+)', line) :
-					abb=re.sub(r'(.+)([A-Z]\. [a-z]+)(.+)', r'\2', line )
-					print "abb "+abb
+					abb=re.findall(r'[A-Z]\. [a-z]+', line )
+					for k in range(len(abb)):
+						if abb[k] not in list_name :
+							list_name.append(abb[k]) 
+	print list_name
 				#for tagg2 in taggs :
 				#	list_taggs2.append(tagg2[1])
 				#for x in list_tag2 : 
