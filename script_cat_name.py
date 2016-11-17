@@ -1,10 +1,10 @@
 #!/usr/bin/python
 #coding: utf-8
 
-dirname = "/Users/Meline/Documents/M2BIG/ADT/data_suj1/train/"
+#dirname = "/Users/Meline/Documents/M2BIG/ADT/data_suj1/train/"
 
 
-import re, nltk, glob
+import re, nltk, glob, sys
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 #nltk.download()
@@ -24,54 +24,67 @@ list_tag1 = [['NNP'], ['NNS'], ['NN']]
 list_tagg_v2 = ['NNP', 'NNS', 'NN']
 list_name=[]
 
-def main():
-	files=glob.glob(dirname+'*.txt')
-	for file in files : 
-		with open(file, 'r') as f_in : 
+def main(dirname):
+	print "\tLancement de l'analyse "
 
-			for n, line in enumerate(f_in) :
-				list_taggs= []
-				list_taggs2 = []
-				tokens = word_tokenize(line)
-				tokens = [i for i in tokens if i not in stop_words]
-				taggs = nltk.pos_tag(tokens)
-				if n==0 : 
-					name=''
-					for tagg1 in taggs :
-						list_taggs.append(tagg1[1])
-					if check_tagg(list_taggs) : 
-						for tag in taggs :
-							name+=tag[0]+' '
-					if name not in list_name:
-						list_name.append(name)
-					if name!='' :
-						#print "name "+name
-				 		break
-				if re.match(r'(.+)?([A-Z][a-z]+(um|us|i|ii|a|as) ([a-z]+)?) (.+)', line) :
-					nom=re.findall(r'([A-Z][a-z]+(um|us|i|ii|a|as) ([a-z]+)?)', line)
-					for j in range(len(nom)) :
-						if nom[j][0] not in list_name :
-							list_name.append(nom[j][0])
-				if re.match(r'(.+)([A-Z]\. [a-z]+)(.+)', line) :
-					abb=re.findall(r'[A-Z]\. [a-z]+', line )
-					for k in range(len(abb)):
-						if abb[k] not in list_name :
-							list_name.append(abb[k]) 
-	print list_name
-				#for tagg2 in taggs :
-				#	list_taggs2.append(tagg2[1])
-				#for x in list_tag2 : 
-				#	try :
-				#		print x
-				#		print list_taggs2
-				#		index= list_taggs2.index(','.join(x))
-				#		print index	
-				#	except : 
-				#		print "pas trouver"			
-					#list_name.append(tagg2[0])
-					
-				#print text_taggs2
-				#if list_taggs2 in list_tag2 : print list_tagg2
+	files=glob.glob(dirname+'*.txt')
+	print "\tOuverture des fichiers "
+
+	with open(dirname+'Results.txt', 'w') as f_out :
+		for file in files : 
+			with open(file, 'r') as f_in : 
+				for n, line in enumerate(f_in) :
+					list_taggs= []
+
+					"""---- Analyse par tagg ---- """
+					tokens = word_tokenize(line)
+					tokens = [i for i in tokens if i not in stop_words]
+					taggs = nltk.pos_tag(tokens)
+
+					"""---- Traitement de la première ligne de chaque texte ----"""
+					if n==0 : 
+						name=''
+						for tagg1 in taggs :
+							list_taggs.append(tagg1[1])
+						if check_tagg(list_taggs) : 
+							for tag in taggs :
+								name+=tag[0]+' '
+						if name not in list_name:
+							list_name.append(name)
+							fichier=re.sub(r'(.+)/(.+).txt', r'\2', file)
+							fin_name="Nom de bacterie dans le fichier "+fichier+"\t"+name+"\n"
+							f_out.write(fin_name)
+							#print "name "+name
+
+
+					"""---- Si la première ligne ne contenait pas le nom de la bactérie----"""
+
+					"""---- On récupère l'ensemble des termes qui ressemble à des noms----"""
+					if re.match(r'(.+)?([A-Z][a-z]+(um|us|i|ii|a|as) (sp . )?([a-z]+)?) (.+)', line) :
+						nom=re.findall(r'([A-Z][a-z]+(um|us|i|ii|a|as) (sp . )?([a-z]+)?)', line)
+						for j in range(len(nom)) :
+							if nom[j][0] not in list_name :
+								if nom[j][0][0] not in stop_words and nom[j][0][1] not in stop_words :
+									fichier=re.sub(r'(.+)/(.+).txt', r'\2', file)
+									fin_nom="Nom de bacterie dans le fichier "+fichier+"\t"+nom[j][0]+"\n"
+									f_out.write(fin_nom)
+									list_name.append(nom[j][0])
+
+
+					"""---- On récupère l'ensemble des abbréviations qui correspondent à des bactéries----"""
+					if re.match(r'(.+)([A-Z]\. [a-z]+)(.+)', line) :
+						abb=re.findall(r'[A-Z]\. [a-z]+', line )
+						for k in range(len(abb)):
+							if abb[k] not in list_name and abb[k].find(" et")== -1 :
+								list_name.append(abb[k]) 
+								fichier=re.sub(r'(.+)/(.+).txt', r'\2', file)
+								fin_abb="Nom de bacterie dans le fichier "+fichier+"\t"+abb[k]+"\n"
+								f_out.write(fin_abb)
+
+	print "\tFin de l'analyse et fermeture des fichiers "
+	
+
+
 					
 				
 
@@ -95,4 +108,8 @@ def check_tagg(list):
 		if list in list_tag7 : return True
 
 if __name__ == '__main__':
-	main()
+	if len(sys.argv)<2 :
+		print "Precisez le dossier contenant vos fichiers"
+	else:
+		dirname = sys.argv[1]
+		main(dirname)
