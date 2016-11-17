@@ -1,8 +1,6 @@
 #!/usr/bin/python
 #coding: utf-8
 
-#dirname = "/Users/Meline/Documents/M2BIG/ADT/data_suj1/train/"
-
 
 import re, nltk, glob, sys
 from nltk.corpus import stopwords
