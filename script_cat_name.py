@@ -28,7 +28,7 @@ def main(dirname):
 	files=glob.glob(dirname+'*.txt')
 	print "\tOuverture des fichiers "
 
-	with open(dirname+'Results.txt', 'w') as f_out :
+	with open(dirname+'Results_addnexw3.txt', 'w') as f_out :
 		for file in files : 
 			with open(file, 'r') as f_in : 
 				for n, line in enumerate(f_in) :
@@ -62,7 +62,8 @@ def main(dirname):
 						nom=re.findall(r'([A-Z][a-z]+(um|us|i|ii|a|as) (sp . )?([a-z]+)?)', line)
 						for j in range(len(nom)) :
 							if nom[j][0] not in list_name :
-								if nom[j][0][0] not in stop_words and nom[j][0][1] not in stop_words :
+								next_word=nom[j][0].split(" ")[1]								
+								if next_word not in stop_words and next_word!='et':
 									fichier=re.sub(r'(.+)/(.+).txt', r'\2', file)
 									fin_nom="Nom de bacterie dans le fichier "+fichier+"\t"+nom[j][0]+"\n"
 									f_out.write(fin_nom)
@@ -73,11 +74,13 @@ def main(dirname):
 					if re.match(r'(.+)([A-Z]\. [a-z]+)(.+)', line) :
 						abb=re.findall(r'[A-Z]\. [a-z]+', line )
 						for k in range(len(abb)):
-							if abb[k] not in list_name and abb[k].find(" et")== -1 :
-								list_name.append(abb[k]) 
-								fichier=re.sub(r'(.+)/(.+).txt', r'\2', file)
-								fin_abb="Nom de bacterie dans le fichier "+fichier+"\t"+abb[k]+"\n"
-								f_out.write(fin_abb)
+							if abb[k] not in list_name :
+								next_abb=abb[k].split(" ")[1]
+								if next_abb not in stop_words and next_abb!='et' :
+									list_name.append(abb[k]) 
+									fichier=re.sub(r'(.+)/(.+).txt', r'\2', file)
+									fin_abb="Nom de bacterie dans le fichier "+fichier+"\t"+abb[k]+"\n"
+									f_out.write(fin_abb)
 
 	print "\tFin de l'analyse et fermeture des fichiers "
 	
