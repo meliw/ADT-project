@@ -2,7 +2,7 @@
 #coding: utf-8
 
 
-import re, nltk, glob, sys
+import re, nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 #nltk.download()
@@ -24,14 +24,7 @@ list_tag1 = [['NNP'], ['NNS'], ['NN']]
 list_tagg_v2 = ['NNP', 'NNS', 'NN']
 
 
-def main(dirname):
-	print ("\tLancement de l'analyse")
-
-	files=glob.glob(dirname+'*.txt')
-	print ("\tOuverture des fichiers ")
-
-	with open(dirname+'Results.txt', 'w') as f_out :
-		for file in files : 
+def cat_name(file):
 			with open(file, 'r') as f_in : 
 				list_name=[]
 				for n,line in enumerate(f_in) :
@@ -110,8 +103,7 @@ def main(dirname):
 										list_name.append(abb[k]) 
 									
 
-				print (list_name)
-	print ("\tFin de l'analyse et fermeture des fichiers ")
+				return list_name	
 	
 
 
@@ -137,9 +129,3 @@ def check_tagg(list):
 	if len(list)==7 : 
 		if list in list_tag7 : return True
 
-if __name__ == '__main__':
-	if len(sys.argv)<2 :
-		print ("Precisez le dossier contenant vos fichiers")
-	else:
-		dirname = sys.argv[1]
-		main(dirname)
